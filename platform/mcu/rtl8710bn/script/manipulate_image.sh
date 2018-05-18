@@ -1,4 +1,8 @@
 #!/bin/sh
+TOOLCHAIN_PATH=$5
+NM=${TOOLCHAIN_PATH}/arm-none-eabi-nm
+OBJCOPY=${TOOLCHAIN_PATH}/arm-none-eabi-objcopy
+
 ota_idx=$1
 #dir=/home/cwhaiyi/pcshare/rualxw/AliOS-Things/platform/mcu/rtl8710bn
 platform_dir=$2/platform/mcu/rtl8710bn
@@ -32,10 +36,10 @@ fi
 find ${BIN_DIR}/ -name "*.axf" | xargs rm -rf
 find ${BIN_DIR}/ -name "*.map" | xargs rm -rf
 cp ${outputdir}/${outputname}.elf ${BIN_DIR}/${outputname}.axf
-arm-none-eabi-nm ${BIN_DIR}/${outputname}.axf | sort > ${BIN_DIR}/${outputname}.nmap
-arm-none-eabi-objcopy -j .ram_image2.entry -j .ram_image2.data -j .ram_image2.text -j .ram_image2.bss -j .ram_image2.skb.bss -j .ram_heap.data -Obinary ${BIN_DIR}/${outputname}.axf ${BIN_DIR}/ram_2.r.bin
-arm-none-eabi-objcopy -j .xip_image2.text -Obinary ${BIN_DIR}/${outputname}.axf ${BIN_DIR}/xip_image2.bin
-arm-none-eabi-objcopy -j .ram_rdp.text -Obinary ${BIN_DIR}/${outputname}.axf ${BIN_DIR}/rdp.bin
+${NM} ${BIN_DIR}/${outputname}.axf | sort > ${BIN_DIR}/${outputname}.nmap
+${OBJCOPY} -j .ram_image2.entry -j .ram_image2.data -j .ram_image2.text -j .ram_image2.bss -j .ram_image2.skb.bss -j .ram_heap.data -Obinary ${BIN_DIR}/${outputname}.axf ${BIN_DIR}/ram_2.r.bin
+${OBJCOPY} -j .xip_image2.text -Obinary ${BIN_DIR}/${outputname}.axf ${BIN_DIR}/xip_image2.bin
+${OBJCOPY} -j .ram_rdp.text -Obinary ${BIN_DIR}/${outputname}.axf ${BIN_DIR}/rdp.bin
 if [ ! -f "${BIN_DIR}/bin/boot_all.bin" ]; then
 	cp ${platform_dir}/bin/boot_all.bin ${BIN_DIR}/boot_all.bin
 fi
@@ -72,4 +76,3 @@ else
 fi
 
 #rm -f ${BIN_DIR}/ram_2.bin ${BIN_DIR}/ram_2.p.bin ${BIN_DIR}/ram_2.r.bin ${BIN_DIR}/xip_image2.bin ${BIN_DIR}/xip_image2.p.bin
-
